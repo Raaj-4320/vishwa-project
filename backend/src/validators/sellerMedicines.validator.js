@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const nonNegative = z.number().min(0, 'Value cannot be negative');
 
-const medicineBody = z.object({
+const medicineBodyBase = z.object({
   name: z.string().trim().min(2).max(120),
   category: z.string().trim().min(2).max(80),
   dosageForm: z.string().trim().min(2).max(80),
@@ -16,9 +16,15 @@ const medicineBody = z.object({
   totalSold: nonNegative,
   price: nonNegative,
   status: z.enum(['active', 'inactive'])
-}).superRefine((val, ctx) => {
+});
+
+const medicineBody = medicineBodyBase.superRefine((val, ctx) => {
   if (val.totalSold > val.totalPurchase) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['totalSold'], message: 'totalSold cannot exceed totalPurchase' });
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['totalSold'],
+      message: 'totalSold cannot exceed totalPurchase'
+    });
   }
 });
 
@@ -29,12 +35,33 @@ export const createSellerMedicineSchema = z.object({
 });
 
 export const updateSellerMedicineSchema = z.object({
-  body: medicineBody.partial().superRefine((val, ctx) => {
+  body: medicineBodyBase.partial().superRefine((val, ctx) => {
     if (val.totalPurchase !== undefined && val.totalPurchase < 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['totalPurchase'], message: 'totalPurchase cannot be negative' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['totalPurchase'],
+        message: 'totalPurchase cannot be negative'
+      });
     }
+
     if (val.totalSold !== undefined && val.totalSold < 0) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['totalSold'], message: 'totalSold cannot be negative' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['totalSold'],
+        message: 'totalSold cannot be negative'
+      });
+    }
+
+    if (
+      val.totalPurchase !== undefined &&
+      val.totalSold !== undefined &&
+      val.totalSold > val.totalPurchase
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['totalSold'],
+        message: 'totalSold cannot exceed totalPurchase'
+      });
     }
   }),
   params: z.object({ id: z.string().min(1) }),
