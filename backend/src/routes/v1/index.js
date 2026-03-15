@@ -3,23 +3,14 @@ import { requireAuth, requireAnyRole } from '../../middlewares/auth.middleware.j
 import { validate } from '../../middlewares/validate.middleware.js';
 import { locationSchema } from '../../validators/location.validator.js';
 import { createOrderSchema } from '../../validators/order.validator.js';
-import { bootstrapSchema } from '../../validators/auth.validator.js';
 import { getLocationMaster, matchStores } from '../../controllers/locations.controller.js';
 import { discoverPharmacies, getPharmacyDetail } from '../../controllers/pharmacies.controller.js';
 import { searchMedicines } from '../../controllers/medicines.controller.js';
 import { createOrder, listOrders } from '../../controllers/orders.controller.js';
 import { adminDashboard } from '../../controllers/admin.controller.js';
-import { bootstrapUser } from '../../controllers/auth.controller.js';
-import { getMe } from '../../controllers/users.controller.js';
 import { ROLES } from '../../constants/roles.js';
-import { createInventoryBatch, createPurchase, createSellerMedicine, getExpiryAlerts, getLowStockItems, getSellerMedicineById, importTransactions, listInventoryBatches, listPurchases, listSellerMedicines, updateInventoryBatch, updateSellerMedicine } from '../../controllers/seller.controller.js';
-import { createSellerMedicineSchema, updateSellerMedicineSchema } from '../../validators/sellerMedicines.validator.js';
-import { createBatchSchema, createPurchaseSchema, importTransactionsSchema, updateBatchSchema } from '../../validators/sellerOperations.validator.js';
 
 export const apiRouter = Router();
-
-apiRouter.post('/auth/bootstrap', requireAuth, validate(bootstrapSchema), bootstrapUser);
-apiRouter.get('/users/me', requireAuth, getMe);
 
 apiRouter.get('/locations/master', getLocationMaster);
 apiRouter.post('/locations/match-stores', validate(locationSchema), matchStores);

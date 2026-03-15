@@ -1,11 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { firebaseAuth } from '../services/firebase.js';
-import { api, setAuthToken } from '../services/api.js';
+import { createContext, useContext, useMemo, useReducer } from 'react';
 
 const initialState = {
-  auth: { user: null, role: null, token: null, profile: null },
-  authLoading: true,
+  auth: { user: null, role: null, token: null },
   location: { state: '', city: '', area: '', locality: '', pincode: '' }
 };
 
@@ -15,9 +11,7 @@ const AppDispatchContext = createContext(() => undefined);
 const reducer = (state, action) => {
   switch (action.type) {
     case 'AUTH_SET':
-      return { ...state, auth: action.payload, authLoading: false };
-    case 'AUTH_LOADING':
-      return { ...state, authLoading: action.payload };
+      return { ...state, auth: action.payload };
     case 'LOCATION_SET':
       return { ...state, location: action.payload };
     default:
